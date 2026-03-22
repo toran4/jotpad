@@ -57,6 +57,9 @@ target_link_libraries(jotpad PRIVATE
     KF6::I18n
 )
 
+# ── Translations ──────────────────────────────────────────────────────────────
+ki18n_install(po)
+
 # ── Install ───────────────────────────────────────────────────────────────────
 install(TARGETS jotpad DESTINATION ${KDE_INSTALL_BINDIR})
 
