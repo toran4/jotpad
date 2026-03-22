@@ -1,0 +1,80 @@
+name: Package DEB
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.2.3)'
+        required: true
+        default: '0.0.0'
+
+jobs:
+  deb:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build g++ gettext \
+            qt6-base-dev qt6-declarative-dev qt6-quick-controls2-dev \
+            libkf6config-dev libkf6coreaddons-dev libkf6i18n-dev \
+            libkf6kirigami-dev
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr
+          cmake --build build
+
+      - name: Install to staging
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          STAGING=$PWD/staging
+          DESTDIR="$STAGING" cmake --install build
+          mkdir -p "$STAGING/DEBIAN"
+          cat > "$STAGING/DEBIAN/control" <<EOF
+          Package: jotpad
+          Version: ${VERSION}
+          Architecture: $(dpkg --print-architecture)
+          Maintainer: JotPad
+          Depends: libkf6configcore6, libkf6coreaddons6, libkf6i18n6, qml6-module-org-kde-kirigami
+          Section: utils
+          Priority: optional
+          Description: A tabbed temporary notes application
+           JotPad is a tabbed temporary notes application built with Qt6
+           and KDE Frameworks 6. Notes are stored per-session.
+          EOF
+
+      - name: Build DEB
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          dpkg-deb --build staging "jotpad_${VERSION}_$(dpkg --print-architecture).deb"
+
+      - name: Upload DEB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jotpad-deb
+          path: jotpad_*.deb
+
+      - name: Create GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: jotpad_*.deb
