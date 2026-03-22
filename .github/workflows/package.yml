@@ -57,13 +57,13 @@ jobs:
       - name: Build RPM
         run: |
           VERSION=${{ steps.version.outputs.version }}
-          rpmbuild -ba ~/rpmbuild/SPECS/jotpad.spec \
+          rpmbuild -ba /usr/src/packages/SPECS/jotpad.spec \
             --define "_version ${VERSION}"
 
       - name: Collect RPM
         run: |
           mkdir -p dist
-          find ~/rpmbuild/RPMS -name '*.rpm' -exec cp {} dist/ \;
+          find /usr/src/packages/RPMS -name '*.rpm' -exec cp {} dist/ \;
 
       - name: Upload RPM artifact
         uses: actions/upload-artifact@v4

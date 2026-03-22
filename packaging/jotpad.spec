@@ -40,5 +40,6 @@ DESTDIR=%{buildroot} cmake --install build
 %files
 %{_bindir}/jotpad
 %{_datadir}/icons/hicolor/*/apps/jotpad*
+%{_datadir}/locale/*/LC_MESSAGES/jotpad.mo
 
 %changelog
