@@ -50,9 +50,9 @@ jobs:
       - name: Set up rpmbuild tree
         run: |
           VERSION=${{ steps.version.outputs.version }}
-          mkdir -p ~/rpmbuild/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
-          cp "/tmp/jotpad-${VERSION}.tar.gz" ~/rpmbuild/SOURCES/
-          cp packaging/jotpad.spec ~/rpmbuild/SPECS/
+          mkdir -p /usr/src/packages/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
+          cp "/tmp/jotpad-${VERSION}.tar.gz" /usr/src/packages/SOURCES/
+          cp packaging/jotpad.spec /usr/src/packages/SPECS/
 
       - name: Build RPM
         run: |
