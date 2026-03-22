@@ -1,0 +1,41 @@
+# Swedish translations for JotPad
+# Copyright (C) 2026
+# This file is distributed under the same license as the jotpad package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: jotpad 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-22\n"
+"PO-Revision-Date: 2026-03-22 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Swedish\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. src/main.cpp
+msgid "JotPad"
+msgstr "JotPad"
+
+#. src/main.cpp
+msgid "A tabbed temporary notes application"
+msgstr "En anteckningsapp med flikar"
+
+#. src/main.cpp
+msgid "© 2026"
+msgstr "© 2026"
+
+#. qml/Main.qml
+msgid "New Note"
+msgstr "Ny anteckning"
+
+#. qml/Main.qml
+msgid "Start typing…"
+msgstr "Börja skriva…"
+
+#. qml/TabButton.qml
+msgid "Close tab"
+msgstr "Stäng flik"
