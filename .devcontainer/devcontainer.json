@@ -1,0 +1,32 @@
+{
+  "name": "JotPad KDE/Qt6 Dev",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": [
+    "--security-opt", "label=disable",
+    "--env", "WAYLAND_DISPLAY=wayland-0",
+    "--env", "XDG_RUNTIME_DIR=/run/user/1000",
+    "--env", "QT_QPA_PLATFORM=wayland",
+    "--volume", "/run/user/1000:/run/user/1000"
+  ],
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "bbenoist.qml"
+      ],
+      "settings": {
+        "cmake.generator": "Ninja",
+        "cmake.buildDirectory": "${workspaceFolder}/build"
+      }
+    }
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.config,target=/home/developer/.config,type=bind,consistency=cached"
+  ],
+  "remoteUser": "developer"
+}
