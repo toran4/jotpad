@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=JotPad
+Name[sv]=JotPad
+GenericName=Notes
+GenericName[sv]=Anteckningar
+Comment=A tabbed temporary notes application
+Comment[sv]=En anteckningsapp med flikar
+Exec=jotpad
+Icon=jotpad
+Terminal=false
+Type=Application
+Categories=Qt;KDE;Utility;

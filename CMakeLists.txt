@@ -64,3 +64,4 @@ ki18n_install(po)
 install(TARGETS jotpad DESTINATION ${KDE_INSTALL_BINDIR})
 
 ecm_install_icons(ICONS icons/sc-apps-jotpad.svg DESTINATION ${KDE_INSTALL_ICONDIR} THEME hicolor)
+install(FILES jotpad.desktop DESTINATION ${KDE_INSTALL_APPDIR})
