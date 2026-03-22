@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: opensuse/tumbleweed:latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          zypper --non-interactive refresh
+          zypper --non-interactive install --no-recommends \
+            cmake ninja gcc-c++ git \
+            qt6-base-devel qt6-declarative-devel qt6-quickcontrols2-devel \
+            kf6-extra-cmake-modules kf6-kconfig-devel kf6-kcoreaddons-devel \
+            kf6-ki18n-devel kf6-kirigami-devel
+
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build

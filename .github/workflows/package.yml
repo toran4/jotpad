@@ -1,0 +1,75 @@
+name: Package RPM
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.2.3)'
+        required: true
+        default: '0.0.0'
+
+jobs:
+  rpm:
+    runs-on: ubuntu-latest
+    container:
+      image: opensuse/tumbleweed:latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          zypper --non-interactive refresh
+          zypper --non-interactive install --no-recommends \
+            cmake ninja gcc-c++ git rpm-build \
+            qt6-base-devel qt6-declarative-devel qt6-quickcontrols2-devel \
+            kf6-extra-cmake-modules kf6-kconfig-devel kf6-kcoreaddons-devel \
+            kf6-ki18n-devel kf6-kirigami-devel
+
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create source tarball
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          git archive --prefix="jotpad-${VERSION}/" HEAD \
+            | gzip > "/tmp/jotpad-${VERSION}.tar.gz"
+
+      - name: Set up rpmbuild tree
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          mkdir -p ~/rpmbuild/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
+          cp "/tmp/jotpad-${VERSION}.tar.gz" ~/rpmbuild/SOURCES/
+          cp packaging/jotpad.spec ~/rpmbuild/SPECS/
+
+      - name: Build RPM
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          rpmbuild -ba ~/rpmbuild/SPECS/jotpad.spec \
+            --define "_version ${VERSION}"
+
+      - name: Collect RPM
+        run: |
+          mkdir -p dist
+          find ~/rpmbuild/RPMS -name '*.rpm' -exec cp {} dist/ \;
+
+      - name: Upload RPM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jotpad-rpm
+          path: dist/*.rpm
+
+      - name: Create GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.rpm
