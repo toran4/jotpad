@@ -66,7 +66,14 @@ Kirigami.ApplicationWindow {
                                 tabTitle: model.title
                                 isActive: noteModel.currentIndex === index
                                 onActivated: noteModel.currentIndex = index
-                                onCloseRequested: noteModel.removeNote(index)
+                                onCloseRequested: {
+                                    if (noteModel.suppressCloseWarning) {
+                                        noteModel.removeNote(index)
+                                    } else {
+                                        closeDialog.pendingIndex = index
+                                        closeDialog.open()
+                                    }
+                                }
                                 onTitleChanged: (newTitle) => noteModel.setTitle(index, newTitle)
                             }
                         }
@@ -86,6 +93,57 @@ Kirigami.ApplicationWindow {
                 }
             }
         }
+
+    // ── Close confirmation dialog ─────────────────────────────────────────────
+    QQC2.Dialog {
+        id: closeDialog
+
+        property int pendingIndex: -1
+
+        parent: QQC2.Overlay.overlay
+        anchors.centerIn: parent
+
+        title: i18n("Close note")
+        modal: true
+
+        contentItem: ColumnLayout {
+            spacing: Kirigami.Units.largeSpacing
+
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 20
+                text: closeDialog.pendingIndex >= 0
+                    ? i18n("The note \"%1\" will be permanently deleted and cannot be recovered.", noteModel.getTitle(closeDialog.pendingIndex))
+                    : ""
+                wrapMode: Text.WordWrap
+            }
+
+            QQC2.CheckBox {
+                id: suppressCheck
+                text: i18n("Don't show this warning again")
+            }
+        }
+
+        footer: QQC2.DialogButtonBox {
+            QQC2.Button {
+                text: i18n("Delete")
+                QQC2.DialogButtonBox.buttonRole: QQC2.DialogButtonBox.AcceptRole
+            }
+            QQC2.Button {
+                text: i18n("Cancel")
+                QQC2.DialogButtonBox.buttonRole: QQC2.DialogButtonBox.RejectRole
+            }
+        }
+
+        onAccepted: {
+            if (suppressCheck.checked) {
+                noteModel.suppressCloseWarning = true
+            }
+            noteModel.removeNote(pendingIndex)
+        }
+
+        onClosed: suppressCheck.checked = false
+    }
 
         // ── Text area ─────────────────────────────────────────────────────────
         QQC2.ScrollView {

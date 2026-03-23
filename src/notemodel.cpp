@@ -3,8 +3,9 @@
 #include <KConfig>
 #include <KConfigGroup>
 
-NoteModel::NoteModel(QObject *parent)
+NoteModel::NoteModel(const QString &configName, QObject *parent)
     : QAbstractListModel(parent)
+    , m_configName(configName)
 {
 }
 
@@ -78,6 +79,24 @@ void NoteModel::setCurrentIndex(int index)
     }
     m_currentIndex = index;
     Q_EMIT currentIndexChanged();
+}
+
+bool NoteModel::suppressCloseWarning() const
+{
+    return m_suppressCloseWarning;
+}
+
+void NoteModel::setSuppressCloseWarning(bool suppress)
+{
+    if (m_suppressCloseWarning == suppress) {
+        return;
+    }
+    m_suppressCloseWarning = suppress;
+    KConfig config(m_configName);
+    KConfigGroup general = config.group(QStringLiteral("General"));
+    general.writeEntry("suppressCloseWarning", suppress);
+    config.sync();
+    Q_EMIT suppressCloseWarningChanged();
 }
 
 QString NoteModel::nextDefaultTitle() const
@@ -162,9 +181,10 @@ QString NoteModel::getContent(int index) const
 
 void NoteModel::loadFromConfig()
 {
-    KConfig config(QStringLiteral("jotpadrc"));
+    KConfig config(m_configName);
     KConfigGroup general = config.group(QStringLiteral("General"));
 
+    m_suppressCloseWarning = general.readEntry("suppressCloseWarning", false);
     int count = general.readEntry("count", 0);
     int savedCurrent = general.readEntry("currentIndex", 0);
     int maxCounter = 0;
@@ -203,10 +223,11 @@ void NoteModel::loadFromConfig()
 
 void NoteModel::saveToConfig() const
 {
-    KConfig config(QStringLiteral("jotpadrc"));
+    KConfig config(m_configName);
     KConfigGroup general = config.group(QStringLiteral("General"));
     general.writeEntry("count", m_notes.size());
     general.writeEntry("currentIndex", m_currentIndex);
+    general.writeEntry("suppressCloseWarning", m_suppressCloseWarning);
 
     // Remove old note groups first
     const QStringList groups = config.groupList();

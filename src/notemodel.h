@@ -15,6 +15,7 @@ class NoteModel : public QAbstractListModel
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
+    Q_PROPERTY(bool suppressCloseWarning READ suppressCloseWarning WRITE setSuppressCloseWarning NOTIFY suppressCloseWarningChanged)
 
 public:
     enum Roles {
@@ -22,7 +23,7 @@ public:
         ContentRole,
     };
 
-    explicit NoteModel(QObject *parent = nullptr);
+    explicit NoteModel(const QString &configName = QStringLiteral("jotpadrc"), QObject *parent = nullptr);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -32,6 +33,8 @@ public:
     int count() const;
     int currentIndex() const;
     void setCurrentIndex(int index);
+    bool suppressCloseWarning() const;
+    void setSuppressCloseWarning(bool suppress);
 
     Q_INVOKABLE void addNote();
     Q_INVOKABLE void removeNote(int index);
@@ -46,10 +49,13 @@ public:
 Q_SIGNALS:
     void countChanged();
     void currentIndexChanged();
+    void suppressCloseWarningChanged();
 
 private:
     QString nextDefaultTitle() const;
 
+    QString m_configName;
+    bool m_suppressCloseWarning = false;
     QVector<Note> m_notes;
     int m_currentIndex = -1;
     int m_noteCounter = 0;

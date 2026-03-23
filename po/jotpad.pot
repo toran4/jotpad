@@ -38,3 +38,23 @@ msgstr ""
 #. qml/TabButton.qml
 msgid "Close tab"
 msgstr ""
+
+#. qml/Main.qml
+msgid "Close note"
+msgstr ""
+
+#. qml/Main.qml
+msgid "The note \"%1\" will be permanently deleted and cannot be recovered."
+msgstr ""
+
+#. qml/Main.qml
+msgid "Don't show this warning again"
+msgstr ""
+
+#. qml/Main.qml
+msgid "Delete"
+msgstr ""
+
+#. qml/Main.qml
+msgid "Cancel"
+msgstr ""

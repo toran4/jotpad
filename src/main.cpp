@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QIcon>
+#include <QProcessEnvironment>
 
 #include <KAboutData>
 #include <KLocalizedContext>
@@ -24,7 +25,9 @@ int main(int argc, char *argv[])
     KAboutData::setApplicationData(aboutData);
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("jotpad")));
 
-    NoteModel noteModel;
+    const bool devMode = QProcessEnvironment::systemEnvironment().value(QStringLiteral("JOTPAD_DEV")) == QStringLiteral("1");
+    const QString configName = devMode ? QStringLiteral("jotpadrc-dev") : QStringLiteral("jotpadrc");
+    NoteModel noteModel(configName);
     noteModel.loadFromConfig();
 
     // If no notes were saved, start with one empty note
