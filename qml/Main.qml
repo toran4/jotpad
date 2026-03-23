@@ -68,7 +68,9 @@ Kirigami.ApplicationWindow {
                                 onActivated: noteModel.currentIndex = index
                                 onCloseRequested: {
                                     if (noteModel.suppressCloseWarning) {
+                                        const ta = textArea
                                         noteModel.removeNote(index)
+                                        Qt.callLater(() => ta.forceActiveFocus())
                                     } else {
                                         closeDialog.pendingIndex = index
                                         closeDialog.open()
@@ -88,7 +90,10 @@ Kirigami.ApplicationWindow {
                     QQC2.ToolTip.text: i18n("New Note")
                     QQC2.ToolTip.visible: hovered
                     QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
-                    onClicked: noteModel.addNote()
+                    onClicked: {
+                        noteModel.addNote()
+                        textArea.forceActiveFocus()
+                    }
                     Layout.alignment: Qt.AlignVCenter
                 }
             }
@@ -139,7 +144,9 @@ Kirigami.ApplicationWindow {
             if (suppressCheck.checked) {
                 noteModel.suppressCloseWarning = true
             }
+            const ta = textArea
             noteModel.removeNote(pendingIndex)
+            Qt.callLater(() => ta.forceActiveFocus())
         }
 
         onClosed: suppressCheck.checked = false
@@ -197,7 +204,12 @@ Kirigami.ApplicationWindow {
                         noteModel.setContent(loadedIndex, text)
                 }
 
-                Component.onCompleted: loadCurrent()
+                Component.onCompleted: {
+                    loadCurrent()
+                    if (noteModel.count > 0) {
+                        forceActiveFocus()
+                    }
+                }
             }
         }
     }
