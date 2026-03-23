@@ -36,6 +36,10 @@ msgstr "Ny anteckning"
 msgid "Start typing…"
 msgstr "Börja skriva…"
 
+#. qml/Main.qml
+msgid "Press + to create a note"
+msgstr "Tryck på + för att skapa en anteckning"
+
 #. qml/TabButton.qml
 msgid "Close tab"
 msgstr "Stäng flik"

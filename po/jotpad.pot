@@ -35,6 +35,10 @@ msgstr ""
 msgid "Start typing…"
 msgstr ""
 
+#. qml/Main.qml
+msgid "Press + to create a note"
+msgstr ""
+
 #. qml/TabButton.qml
 msgid "Close tab"
 msgstr ""

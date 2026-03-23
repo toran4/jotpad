@@ -156,8 +156,9 @@ Kirigami.ApplicationWindow {
 
                 property int loadedIndex: -1
 
+                enabled: noteModel.count > 0
                 wrapMode: TextEdit.Wrap
-                placeholderText: i18n("Start typing…")
+                placeholderText: noteModel.count > 0 ? i18n("Start typing…") : i18n("Press + to create a note")
                 background: Rectangle { color: Kirigami.Theme.backgroundColor }
                 font.family: "monospace"
                 color: Kirigami.Theme.textColor
