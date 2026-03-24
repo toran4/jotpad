@@ -12,16 +12,6 @@ Keep a handful of plain-text scratch pads open while you work — one for comman
 - Closing a tab discards its content immediately — intentional
 - Lightweight native Plasma app — fits the KDE desktop without friction
 
-## Tech stack
-
-| Layer | Technology |
-|-------|-----------|
-| UI | Qt6 / QML / Kirigami |
-| Backend | C++17 |
-| Persistence | KConfig (KF6) |
-| Build | CMake + ECM + Ninja |
-
----
 
 ## Installation
 
