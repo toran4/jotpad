@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
+import Qt.labs.settings
 import org.kde.kirigami as Kirigami
 
 Kirigami.ApplicationWindow {
@@ -11,6 +12,11 @@ Kirigami.ApplicationWindow {
     height: 600
     minimumWidth: 400
     minimumHeight: 300
+
+    Settings {
+        property alias width: root.width
+        property alias height: root.height
+    }
 
     // Remove default page stack — we manage our own tab UI
     pageStack.visible: false
