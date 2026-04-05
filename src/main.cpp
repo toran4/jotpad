@@ -36,12 +36,11 @@ int main(int argc, char *argv[])
     }
 
     QQmlApplicationEngine engine;
-    engine.addImportPath(QStringLiteral("qrc:/"));
     // Make i18n() available in QML
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("noteModel"), &noteModel);
 
-    engine.loadFromModule("JotPad", "Main");
+    engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
 
     if (engine.rootObjects().isEmpty()) {
         return -1;

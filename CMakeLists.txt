@@ -38,10 +38,9 @@ add_executable(jotpad
     src/notemodel.h
 )
 
-qt_add_qml_module(jotpad
-    URI "JotPad"
-    VERSION 1.0
-    QML_FILES
+qt_add_resources(jotpad "qml"
+    PREFIX "/"
+    FILES
         qml/Main.qml
         qml/TabButton.qml
 )
