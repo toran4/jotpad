@@ -26,6 +26,12 @@ jobs:
           # ca-certificates is only a *Recommends* of git/libcurl, so
           # --no-install-recommends would leave the container with no CA
           # bundle and actions/checkout would fail on the HTTPS fetch.
+          #
+          # appimagetool hard-requires the `file` binary at startup and exits 1
+          # with "file command is missing but required" when it is absent, so it
+          # must be listed explicitly. (mksquashfs and desktop-file-validate are
+          # required too, but both are bundled statically inside the appimagetool
+          # AppImage, which prepends its own usr/bin to PATH via AppRun.sh.)
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             ca-certificates \
             cmake ninja-build g++ git wget \
@@ -33,7 +39,8 @@ jobs:
             qt6-base-dev qt6-declarative-dev \
             fcitx5-frontend-qt6 \
             libkf6config-dev libkf6coreaddons-dev libkf6i18n-dev libkirigami-dev \
-            gettext
+            gettext \
+            file
 
       - uses: actions/checkout@v4
 
