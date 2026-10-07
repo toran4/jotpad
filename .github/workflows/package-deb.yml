@@ -23,7 +23,11 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update -q
+          # ca-certificates is only a *Recommends* of git/libcurl, so
+          # --no-install-recommends would leave the container with no CA
+          # bundle and actions/checkout would fail on the HTTPS fetch.
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates \
             cmake ninja-build g++ git \
             extra-cmake-modules \
             qt6-base-dev qt6-declarative-dev \
