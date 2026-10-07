@@ -1,0 +1,91 @@
+name: Package AppImage
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.2.3)'
+        required: true
+        default: '0.0.0'
+
+jobs:
+  appimage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container:
+      image: ubuntu:26.04
+
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update -q
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            cmake ninja-build g++ git wget \
+            extra-cmake-modules \
+            qt6-base-dev qt6-declarative-dev qt6-quick-controls2-dev \
+            libkf6config-dev libkf6coreaddons-dev libkf6i18n-dev libkirigami-dev \
+            gettext
+
+      - uses: actions/checkout@v4
+
+      - name: Fix git ownership
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Install to staging directory
+        run: |
+          DESTDIR=appdir cmake --install build
+
+      - name: Download linuxdeployqt
+        run: |
+          wget -c -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+          chmod +x linuxdeployqt-continuous-x86_64.AppImage
+
+      - name: Create AppImage
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          export QML_SOURCES_PATHS="${{ github.workspace }}"
+          ./linuxdeployqt-continuous-x86_64.AppImage \
+            appdir/usr/share/applications/jotpad.desktop \
+            -appimage \
+            -qmake=$(which qmake6) \
+            -extra-plugins=platforminputcontexts/libfcitxplatforminputcontextplugin.so,platforminputcontexts/libibusplatforminputcontextplugin.so \
+            -verbose=2
+
+      - name: Collect AppImage
+        run: |
+          mkdir -p dist
+          find . -maxdepth 1 -name '*.AppImage' -exec cp {} dist/ \;
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jotpad-appimage
+          path: dist/*.AppImage
+
+      - name: Create GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.AppImage
