@@ -1,0 +1,89 @@
+name: Package DEB
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.2.3)'
+        required: true
+        default: '0.0.0'
+
+jobs:
+  deb:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container:
+      image: ubuntu:26.04
+
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update -q
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            cmake ninja-build g++ git \
+            extra-cmake-modules \
+            qt6-base-dev qt6-declarative-dev qt6-quick-controls2-dev \
+            libkf6config-dev libkf6coreaddons-dev libkf6i18n-dev libkirigami-dev \
+            gettext \
+            dpkg-dev fakeroot
+
+      - uses: actions/checkout@v4
+
+      - name: Fix git ownership
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Resolve version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="$INPUT_VERSION"
+          fi
+          if [[ ! "$version" =~ ^[0-9][A-Za-z0-9.+:~-]*$ ]]; then
+            echo "Invalid Debian package version: $version" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Configure
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCPACK_GENERATOR=DEB \
+            -DCPACK_PACKAGE_VERSION="${VERSION}" \
+            -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=ON \
+            -DCPACK_DEBIAN_PACKAGE_MAINTAINER="Tor Andrae <Dmz@andrae.se>" \
+            -DCPACK_DEBIAN_PACKAGE_DEPENDS="qml6-module-qtqml, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-org-kde-kirigami"
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Package
+        run: |
+          cd build
+          cpack -G DEB
+
+      - name: Collect DEB
+        run: |
+          mkdir -p dist
+          find build -name '*.deb' -exec cp {} dist/ \;
+
+      - name: Upload DEB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jotpad-deb
+          path: dist/*.deb
+
+      - name: Create GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.deb
