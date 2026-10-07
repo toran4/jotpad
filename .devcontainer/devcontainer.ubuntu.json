@@ -1,0 +1,24 @@
+{
+  "name": "JotPad Ubuntu 26.04 (matches DEB + AppImage CI)",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile.ubuntu"
+  },
+  "runArgs": [
+    "--security-opt", "label=disable"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "bbenoist.qml"
+      ],
+      "settings": {
+        "cmake.generator": "Ninja",
+        "cmake.buildDirectory": "${workspaceFolder}/build-ubuntu"
+      }
+    }
+  },
+  "remoteUser": "developer"
+}

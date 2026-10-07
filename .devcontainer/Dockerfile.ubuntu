@@ -1,0 +1,32 @@
+# Ubuntu 26.04 build environment mirroring the GitHub Actions workflows.
+#
+# This is deliberately a SEPARATE image from ./Dockerfile, which is
+# openSUSE-based and targets the RPM job + local development. The DEB and
+# AppImage jobs run on ubuntu:26.04, so use this one to reproduce them.
+FROM ubuntu:26.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ca-certificates must be listed explicitly: it is only a *Recommends* of
+# git and libcurl, so the workflows' --no-install-recommends would
+# otherwise leave the image with no CA bundle (breaking HTTPS/git).
+# `file` is required by CPackDeb when CPACK_DEBIAN_PACKAGE_SHLIBDEPS=ON.
+RUN apt-get update -q && \
+    apt-get install -y --no-install-recommends \
+      ca-certificates \
+      cmake ninja-build g++ git wget \
+      extra-cmake-modules \
+      qt6-base-dev qt6-declarative-dev \
+      fcitx5-frontend-qt6 \
+      libkf6config-dev libkf6coreaddons-dev libkf6i18n-dev libkirigami-dev \
+      gettext \
+      dpkg-dev fakeroot \
+      file && \
+    rm -rf /var/lib/apt/lists/*
+
+# Same non-root user and path as ./Dockerfile so both images behave alike.
+RUN useradd -m -s /bin/bash developer && \
+    mkdir -p /workspaces && \
+    chown developer:developer /workspaces
+USER developer
+WORKDIR /workspaces/jotpad

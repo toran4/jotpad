@@ -33,7 +33,8 @@ jobs:
             qt6-base-dev qt6-declarative-dev \
             libkf6config-dev libkf6coreaddons-dev libkf6i18n-dev libkirigami-dev \
             gettext \
-            dpkg-dev fakeroot
+            dpkg-dev fakeroot \
+            file
 
       - uses: actions/checkout@v4
 

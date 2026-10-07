@@ -61,6 +61,12 @@ jobs:
       - name: Install to staging directory
         run: |
           DESTDIR=appdir cmake --install build
+          # -unsupported-allow-new-glibc (needed because ubuntu:26.04 has
+          # glibc 2.43) makes linuxdeployqt abort unless libc6's copyright
+          # file is present in the AppDir, so it can prove the bundle is
+          # not broken. It exits(1) with no message when this is missing.
+          mkdir -p appdir/usr/share/doc/libc6
+          cp /usr/share/doc/libc6/copyright appdir/usr/share/doc/libc6/copyright
 
       - name: Download linuxdeployqt
         run: |
