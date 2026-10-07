@@ -26,7 +26,7 @@ jobs:
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             cmake ninja-build g++ git \
             extra-cmake-modules \
-            qt6-base-dev qt6-declarative-dev qtquickcontrols2-6-dev \
+            qt6-base-dev qt6-declarative-dev \
             libkf6config-dev libkf6coreaddons-dev libkf6i18n-dev libkirigami-dev \
             gettext \
             dpkg-dev fakeroot

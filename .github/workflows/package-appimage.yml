@@ -26,7 +26,8 @@ jobs:
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             cmake ninja-build g++ git wget \
             extra-cmake-modules \
-            qt6-base-dev qt6-declarative-dev qtquickcontrols2-6-dev \
+            qt6-base-dev qt6-declarative-dev \
+            fcitx5-frontend-qt6 \
             libkf6config-dev libkf6coreaddons-dev libkf6i18n-dev libkirigami-dev \
             gettext
 
@@ -66,11 +67,15 @@ jobs:
         run: |
           VERSION=${{ steps.version.outputs.version }}
           export QML_SOURCES_PATHS="${{ github.workspace }}"
+          # Containers have no /dev/fuse, so the AppImage cannot self-mount.
+          # Extract-and-run is the documented workaround for Docker/CI.
+          export APPIMAGE_EXTRACT_AND_RUN=1
           ./linuxdeployqt-continuous-x86_64.AppImage \
             appdir/usr/share/applications/jotpad.desktop \
             -appimage \
             -qmake=$(which qmake6) \
-            -extra-plugins=platforminputcontexts/libfcitxplatforminputcontextplugin.so,platforminputcontexts/libibusplatforminputcontextplugin.so \
+            -extra-plugins=platforminputcontexts/libfcitx5platforminputcontextplugin.so \
+            -unsupported-allow-new-glibc \
             -verbose=2
 
       - name: Collect AppImage
