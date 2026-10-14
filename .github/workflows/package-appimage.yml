@@ -108,11 +108,22 @@ jobs:
           #
           # Note: the older QML_SOURCES_PATHS environment variable is dead --
           # current linuxdeployqt does not reference it anywhere.
+          #
+          # -qmldir must point at the *real* checkout. Do NOT use the
+          # github.workspace context here (it is written without the ${{ }}
+          # wrapper on purpose: Actions would substitute it inside this
+          # comment too). In a container job the checkout is mounted at
+          # /__w/<repo>/<repo>, but that context still reports
+          # /home/runner/work/<repo>/<repo>. qmlimportscanner then dies with
+          # 'No such file or directory: .../qml' and, because -qmldir was given
+          # explicitly, linuxdeployqt treats that as fatal and exits 1.
+          # $PWD is unambiguous: the rest of this step already passes relative
+          # paths (appdir/...) which resolve against this same directory.
           ./linuxdeployqt-continuous-x86_64.AppImage \
             appdir/usr/share/applications/jotpad.desktop \
             -appimage \
             -qmake=$(which qmake6) \
-            -qmldir="${{ github.workspace }}/qml" \
+            -qmldir="$PWD/qml" \
             -extra-plugins=platforminputcontexts/libfcitx5platforminputcontextplugin.so \
             -unsupported-allow-new-glibc \
             -verbose=2
