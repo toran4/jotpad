@@ -66,20 +66,34 @@ case "$TARGET" in
       chmod +x linuxdeployqt-continuous-x86_64.AppImage
     fi
 
-    export QML_SOURCES_PATHS="$PROJECT_ROOT"
+    # VERSION must be exported: without it appimagetool names the AppImage after
+    # `git rev-parse --short HEAD` instead of the release version.
+    export VERSION
+    # Must be a UTF-8 locale, otherwise qmake6 -query emits a locale warning
+    # that linuxdeployqt fails to parse, leaving QT_INSTALL_QML empty.
+    export LC_ALL=C.UTF-8
     # Containers have no /dev/fuse, so the AppImage cannot self-mount.
+    # Extract-and-run is the documented workaround for Docker/CI.
     # ubuntu:26.04 has glibc 2.43, which linuxdeployqt refuses without this flag.
     export APPIMAGE_EXTRACT_AND_RUN=1
+    # -qmldir is required because our QML is compiled into the binary's qrc:
+    # resource. Without it qmlimportscanner cannot see the imports and no QML
+    # module is bundled, so the app aborts with 'module "QtQuick" is not
+    # installed'. See package-appimage.yml for the full explanation.
     ./linuxdeployqt-continuous-x86_64.AppImage \
       "$APPDIR/usr/share/applications/jotpad.desktop" \
       -appimage \
       -qmake="$(command -v qmake6)" \
+      -qmldir="$PROJECT_ROOT/qml" \
       -extra-plugins=platforminputcontexts/libfcitx5platforminputcontextplugin.so \
       -unsupported-allow-new-glibc \
       -verbose=2
 
     mkdir -p dist
-    find . -maxdepth 1 -name '*.AppImage' -exec cp {} dist/ \;
+    # Exclude the linuxdeployqt tool itself: it is also an *.AppImage and sits
+    # in the repo root, so a plain glob would copy it into dist/ as well.
+    find . -maxdepth 1 -name '*.AppImage' ! -name 'linuxdeployqt-*' \
+      -exec cp {} dist/ \;
     echo "--- dist ---"; ls -la dist/*.AppImage
     ;;
 

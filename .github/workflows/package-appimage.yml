@@ -83,14 +83,36 @@ jobs:
       - name: Create AppImage
         run: |
           VERSION=${{ steps.version.outputs.version }}
-          export QML_SOURCES_PATHS="${{ github.workspace }}"
+          # Without this the AppImage is named after `git rev-parse --short HEAD`
+          # (e.g. JotPad-aff5634-x86_64.AppImage) instead of the release version.
+          export VERSION
+          # Must be a UTF-8 locale; see the long note below.
+          export LC_ALL=C.UTF-8
           # Containers have no /dev/fuse, so the AppImage cannot self-mount.
           # Extract-and-run is the documented workaround for Docker/CI.
           export APPIMAGE_EXTRACT_AND_RUN=1
+          # -qmldir is mandatory:
+          #
+          #   * Our QML lives inside the binary's qrc: resource, so the ELF
+          #     dependency graph alone tells linuxdeployqt nothing about it.
+          #     -qmldir lets qmlimportscanner read qml/*.qml from disk and
+          #     report the real imports, which is what pulls QtQuick, QtCore,
+          #     QtQuick.Controls, QtQuick.Layouts and org.kde.kirigami (plus
+          #     their shared libraries) into the AppImage. Without it the app
+          #     aborts at startup with 'module "QtQuick" is not installed'.
+          #   * LC_ALL must be a UTF-8 locale. Under LANG=C, qmake6 -query
+          #     prints a "Detected locale ... is not UTF-8" warning and
+          #     linuxdeployqt merges it into the parsed output, so
+          #     QT_INSTALL_QML comes back empty and the QML modules are not
+          #     deployed either.
+          #
+          # Note: the older QML_SOURCES_PATHS environment variable is dead --
+          # current linuxdeployqt does not reference it anywhere.
           ./linuxdeployqt-continuous-x86_64.AppImage \
             appdir/usr/share/applications/jotpad.desktop \
             -appimage \
             -qmake=$(which qmake6) \
+            -qmldir="${{ github.workspace }}/qml" \
             -extra-plugins=platforminputcontexts/libfcitx5platforminputcontextplugin.so \
             -unsupported-allow-new-glibc \
             -verbose=2
@@ -98,7 +120,11 @@ jobs:
       - name: Collect AppImage
         run: |
           mkdir -p dist
-          find . -maxdepth 1 -name '*.AppImage' -exec cp {} dist/ \;
+          # Exclude the linuxdeployqt tool itself: it is also an *.AppImage and
+          # lives in the repo root, so a plain glob would upload it as a
+          # release asset.
+          find . -maxdepth 1 -name '*.AppImage' ! -name 'linuxdeployqt-*' \
+            -exec cp {} dist/ \;
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
