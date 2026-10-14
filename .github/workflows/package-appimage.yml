@@ -110,10 +110,8 @@ jobs:
           # current linuxdeployqt does not reference it anywhere.
           #
           # -qmldir must point at the *real* checkout. Do NOT use the
-          # github.workspace context here (it is written without the ${{ }}
-          # wrapper on purpose: Actions would substitute it inside this
-          # comment too). In a container job the checkout is mounted at
-          # /__w/<repo>/<repo>, but that context still reports
+          # github.workspace context here: in a container job the checkout is
+          # mounted at /__w/<repo>/<repo>, but that context still reports
           # /home/runner/work/<repo>/<repo>. qmlimportscanner then dies with
           # 'No such file or directory: .../qml' and, because -qmldir was given
           # explicitly, linuxdeployqt treats that as fatal and exits 1.
