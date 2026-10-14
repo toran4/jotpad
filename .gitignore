@@ -1,8 +1,16 @@
-# Build directory
+# Build directories
 build/
+build-*/
 
 # Qt/CMake generated files
 compile_commands.json
+
+# Packaging artifacts (build-local.sh, .github/workflows/package-*.yml)
+appdir/
+dist/
+*.AppImage
+*.deb
+*.rpm
 
 # Claude Code local settings
 .claude/

@@ -75,10 +75,10 @@ install(FILES jotpad.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 
 set(CPACK_PACKAGE_NAME "jotpad")
 set(CPACK_PACKAGE_VENDOR "toran4")
-set(CPACK_PACKAGE_CONTACT "Dmz@toran.s1")
+set(CPACK_PACKAGE_CONTACT "34127841+toran4@users.noreply.github.com")
 # CPACK_DEBIAN_PACKAGE_MAINTAINER wins over CPACK_PACKAGE_CONTACT and is the
 # only one that can carry a display name alongside the address.
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "toran4 <Dmz@toran.s1>")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "toran4 <34127841+toran4@users.noreply.github.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A tabbed temporary notes application")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/toran4/jotpad")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
