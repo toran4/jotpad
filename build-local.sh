@@ -33,14 +33,13 @@ case "$TARGET" in
     ;;
 
   deb)
-    # Same CPack flags as package-deb.yml.
+    # Packaging metadata (maintainer, section, dependencies) lives in
+    # CMakeLists.txt; only the generator and version are passed here, exactly
+    # like package-deb.yml.
     cmake -B "$BUILD_DIR" -G Ninja -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/usr \
       -DCPACK_GENERATOR=DEB \
       -DCPACK_PACKAGE_VERSION="${VERSION}" \
-      -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=ON \
-      -DCPACK_DEBIAN_PACKAGE_MAINTAINER="Tor Andrae <Dmz@andrae.se>" \
-      -DCPACK_DEBIAN_PACKAGE_DEPENDS="qml6-module-qtqml, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-org-kde-kirigami" \
       "$PROJECT_ROOT"
     cmake --build "$BUILD_DIR"
     ( cd "$BUILD_DIR" && cpack -G DEB )

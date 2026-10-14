@@ -14,6 +14,11 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    // Must happen before any i18n() call, otherwise the strings passed to the
+    // KAboutData constructor below are translated without a domain and are
+    // silently emitted untranslated.
+    KLocalizedString::setApplicationDomain(QByteArrayLiteral("jotpad"));
+
     KAboutData aboutData(
         QStringLiteral("jotpad"),
         i18n("JotPad"),

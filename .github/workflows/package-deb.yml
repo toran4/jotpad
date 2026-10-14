@@ -58,15 +58,14 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Configure
+        # Package metadata (maintainer, section, dependencies) lives in
+        # CMakeLists.txt so it has a single source of truth.
         run: |
           VERSION=${{ steps.version.outputs.version }}
           cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=/usr \
             -DCPACK_GENERATOR=DEB \
-            -DCPACK_PACKAGE_VERSION="${VERSION}" \
-            -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=ON \
-            -DCPACK_DEBIAN_PACKAGE_MAINTAINER="Tor Andrae <Dmz@andrae.se>" \
-            -DCPACK_DEBIAN_PACKAGE_DEPENDS="qml6-module-qtqml, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-org-kde-kirigami"
+            -DCPACK_PACKAGE_VERSION="${VERSION}"
 
       - name: Build
         run: cmake --build build

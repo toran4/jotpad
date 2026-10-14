@@ -65,4 +65,42 @@ install(TARGETS jotpad DESTINATION ${KDE_INSTALL_BINDIR})
 ecm_install_icons(ICONS icons/sc-apps-jotpad.svg DESTINATION ${KDE_INSTALL_ICONDIR} THEME hicolor)
 install(FILES jotpad.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 
+# ── Packaging (CPack) ─────────────────────────────────────────────────────────
+# All packaging metadata lives here so it has a single source of truth. The
+# workflows and build-local.sh only pass the generator and the version, which
+# is resolved from the git tag at build time.
+#
+# NOTE: every CPACK_* variable must be set *before* include(CPack), because
+# include(CPack) snapshots them into the generator configuration.
+
+set(CPACK_PACKAGE_NAME "jotpad")
+set(CPACK_PACKAGE_VENDOR "toran4")
+set(CPACK_PACKAGE_CONTACT "Dmz@toran.s1")
+# CPACK_DEBIAN_PACKAGE_MAINTAINER wins over CPACK_PACKAGE_CONTACT and is the
+# only one that can carry a display name alongside the address.
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "toran4 <Dmz@toran.s1>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A tabbed temporary notes application")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/toran4/jotpad")
+set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+
+# Derive the shared-library dependencies from the ELF binaries.
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+# QML modules imported by qml/*.qml. These are resolved from the system QML
+# import path at *run time* and are therefore invisible to dpkg-shlibdeps, so
+# they must be listed explicitly. A missing entry makes the app abort on
+# startup, e.g.
+#     QQmlApplicationEngine failed to load component
+#     qrc:/qml/Main.qml:4:1: module "QtCore" is not installed
+# Keep in sync with the `import` statements in qml/Main.qml and qml/TabButton.qml.
+# Given as a CMake list; CPackDeb joins it with ", ".
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+    qml6-module-qtcore
+    qml6-module-qtqml
+    qml6-module-qtquick
+    qml6-module-qtquick-controls
+    qml6-module-qtquick-layouts
+    qml6-module-org-kde-kirigami
+)
+
 include(CPack)
