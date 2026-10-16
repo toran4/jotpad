@@ -131,6 +131,17 @@ Rectangle {
             Keys.onEscapePressed: labelLoader.stopEditing()
             onEditingFinished: commit()
 
+            Shortcut {
+                sequence: "Ctrl+Shift+C"
+                context: Qt.WidgetShortcut
+                onActivated: titleField.copy()
+            }
+            Shortcut {
+                sequence: "Ctrl+Shift+V"
+                context: Qt.WidgetShortcut
+                onActivated: titleField.paste()
+            }
+
             // Stop single-click from propagating to tab activation
             TapHandler { }
         }

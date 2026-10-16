@@ -216,6 +216,19 @@ Kirigami.ApplicationWindow {
                         forceActiveFocus()
                     }
                 }
+
+                // Extra copy/paste shortcuts (terminal-style) in addition to
+                // the built-in Ctrl+C / Ctrl+V.
+                Shortcut {
+                    sequence: "Ctrl+Shift+C"
+                    context: Qt.WidgetShortcut
+                    onActivated: textArea.copy()
+                }
+                Shortcut {
+                    sequence: "Ctrl+Shift+V"
+                    context: Qt.WidgetShortcut
+                    onActivated: textArea.paste()
+                }
             }
         }
     }
