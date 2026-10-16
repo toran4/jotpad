@@ -7,6 +7,7 @@ Comment=A tabbed temporary notes application
 Comment[sv]=En anteckningsapp med flikar
 Exec=jotpad
 Icon=jotpad
+StartupWMClass=jotpad
 Terminal=false
 Type=Application
 Categories=Qt;KDE;Utility;

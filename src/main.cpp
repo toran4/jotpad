@@ -28,6 +28,10 @@ int main(int argc, char *argv[])
         i18n("© 2026")
     );
     KAboutData::setApplicationData(aboutData);
+    // Associates running windows (Wayland app-id / X11 WM_CLASS) with
+    // jotpad.desktop so GNOME and KDE show the correct icon in
+    // task managers/docks instead of a generic one.
+    app.setDesktopFileName(QStringLiteral("jotpad"));
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("jotpad")));
 
     const bool devMode = QProcessEnvironment::systemEnvironment().value(QStringLiteral("JOTPAD_DEV")) == QStringLiteral("1");
