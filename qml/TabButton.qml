@@ -67,7 +67,15 @@ Rectangle {
         // Close button
         QQC2.ToolButton {
             id: closeBtn
-            icon.name: "tab-close"
+            // "window-close" is the freedesktop name and exists in Yaru
+            // (Ubuntu) and Breeze. Do not use Breeze's "tab-close": it is
+            // missing from the Ubuntu icon themes. If the current theme has
+            // no matching icon at all, the embedded :/icons/window-close.png
+            // is used (see QIcon::setFallbackSearchPaths() in src/main.cpp).
+            icon.name: "window-close"
+            icon.width: Kirigami.Units.iconSizes.small
+            icon.height: Kirigami.Units.iconSizes.small
+            icon.color: root.isActive ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
             implicitWidth: Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
             implicitHeight: implicitWidth
             opacity: hoverHandler.hovered || root.isActive ? 1 : 0

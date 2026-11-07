@@ -43,6 +43,11 @@ qt_add_resources(jotpad "qml"
     FILES
         qml/Main.qml
         qml/TabButton.qml
+        # Fallback action icons embedded at :/icons/. Qt searches this
+        # directory last when the system icon theme has no match (see
+        # QIcon::setFallbackSearchPaths() in src/main.cpp).
+        icons/list-add.png
+        icons/window-close.png
 )
 
 target_link_libraries(jotpad PRIVATE

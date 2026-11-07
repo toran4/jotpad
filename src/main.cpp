@@ -34,6 +34,13 @@ int main(int argc, char *argv[])
     app.setDesktopFileName(QStringLiteral("jotpad"));
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("jotpad")));
 
+    // Icon themes are not guaranteed to provide the action icons we use.
+    // Ubuntu's Adwaita, for example, only ships symbolic variants such as
+    // "window-close-symbolic", so a lookup of "window-close" finds nothing
+    // and the button is rendered blank. The icons embedded in the binary
+    // (:/icons) act as a last-resort fallback for every themed icon.
+    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << QStringLiteral(":/icons"));
+
     const bool devMode = QProcessEnvironment::systemEnvironment().value(QStringLiteral("JOTPAD_DEV")) == QStringLiteral("1");
     const QString configName = devMode ? QStringLiteral("jotpadrc-dev") : QStringLiteral("jotpadrc");
     NoteModel noteModel(configName);
