@@ -91,9 +91,6 @@ Kirigami.ApplicationWindow {
                 // "+" button
                 QQC2.ToolButton {
                     icon.name: "list-add"
-                    icon.width: Kirigami.Units.iconSizes.small
-                    icon.height: Kirigami.Units.iconSizes.small
-                    icon.color: Kirigami.Theme.textColor
                     text: i18n("New Note")
                     display: QQC2.AbstractButton.IconOnly
                     QQC2.ToolTip.text: i18n("New Note")
