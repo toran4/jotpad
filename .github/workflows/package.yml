@@ -29,7 +29,7 @@ jobs:
             kf6-extra-cmake-modules kf6-kconfig-devel kf6-kcoreaddons-devel \
             kf6-ki18n-devel kf6-kirigami-devel
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Fix git ownership
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -68,7 +68,7 @@ jobs:
           find /usr/src/packages/RPMS -name 'jotpad-[0-9]*.rpm' -exec cp {} dist/ \;
 
       - name: Upload RPM artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: jotpad-rpm
           path: dist/*.rpm

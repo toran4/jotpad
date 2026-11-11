@@ -36,7 +36,7 @@ jobs:
             dpkg-dev fakeroot \
             file
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Fix git ownership
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -81,7 +81,7 @@ jobs:
           find build -name '*.deb' -exec cp {} dist/ \;
 
       - name: Upload DEB artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: jotpad-deb
           path: dist/*.deb

@@ -42,7 +42,7 @@ jobs:
             gettext \
             file
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Fix git ownership
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -136,7 +136,7 @@ jobs:
             -exec cp {} dist/ \;
 
       - name: Upload AppImage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: jotpad-appimage
           path: dist/*.AppImage

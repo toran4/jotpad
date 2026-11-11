@@ -21,7 +21,7 @@ jobs:
             kf6-extra-cmake-modules kf6-kconfig-devel kf6-kcoreaddons-devel \
             kf6-ki18n-devel kf6-kirigami-devel
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Configure
         run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
